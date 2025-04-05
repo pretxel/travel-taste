@@ -1,31 +1,48 @@
-"use client";
+/* eslint-disable no-undef */
+'use client';
 
-import Link from "next/link";
-import { ModeToggle } from "@/components/mode-toggle";
-import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { ReactNode } from 'react';
+import { SESSION_KEY } from '@/lib/constants';
+import { useEffect, useState } from 'react';
 
 interface NavigationProps {
   onLogout: () => void;
+  themeToggle: ReactNode;
 }
 
-export default function Navigation({ onLogout }: NavigationProps) {
+export default function Navigation({ onLogout, themeToggle }: NavigationProps) {
+  const [hasSession, setHasSession] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && typeof window !== 'undefined') {
+      const session = window.localStorage.getItem(SESSION_KEY);
+      setHasSession(session === 'authenticated');
+    }
+  }, [mounted]);
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-16 items-center justify-between px-4">
-        <div className="flex-1" />
-        <h1 className="text-xl font-bold">Travel and Taste</h1>
-        <div className="flex flex-1 items-center justify-end gap-2">
-          <ModeToggle />
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onLogout}
-            className="h-9 w-9"
-          >
-            <LogOut className="h-5 w-5" />
-            <span className="sr-only">Logout</span>
-          </Button>
+    <nav className="border-b">
+      <div className="flex h-16 items-center px-4">
+        <div className="fixed left-1/2 top-4 -translate-x-1/2">
+          <h1 className="text-2xl font-bold">Travel and Taste</h1>
+        </div>
+        <div className="flex items-center space-x-4 ml-auto">
+          {themeToggle}
+          {hasSession && (
+            <Button variant="outline" onClick={onLogout}>
+              Logout
+            </Button>
+          )}
         </div>
       </div>
     </nav>

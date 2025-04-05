@@ -1,74 +1,68 @@
-"use client";
+/* eslint-disable no-undef */
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+
+const SESSION_KEY = 'session';
 
 interface LoginFormProps {
-  onLogin: () => void;
+  className?: string;
 }
 
-export function LoginForm({ onLogin }: LoginFormProps) {
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+export function LoginForm({ className }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
+    setError('');
 
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    if (password === process.env.NEXT_PUBLIC_APP_PASSWORD) {
-      onLogin();
-    } else {
-      setError("Incorrect password");
+    try {
+      if (typeof window !== 'undefined' && typeof process !== 'undefined') {
+        if (password === process.env.NEXT_PUBLIC_APP_PASSWORD) {
+          window.localStorage.setItem(SESSION_KEY, 'authenticated');
+          window.location.href = '/';
+        } else {
+          setError('Invalid password');
+        }
+      }
+    } catch (err) {
+      if (typeof console !== 'undefined') {
+        console.error('Login error:', err);
+      }
+      setError('An error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md p-8 space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold">Welcome to Travel and Taste</h1>
-          <p className="mt-2 text-muted-foreground">
-            Enter your password to view the adventures
-          </p>
-        </div>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
+    <div className={cn('grid gap-6', className)}>
+      <form onSubmit={handleSubmit}>
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="password">Password</Label>
             <Input
+              id="password"
               type="password"
-              placeholder="Enter password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="h-12"
+              onChange={e => setPassword(e.target.value)}
               disabled={isLoading}
+              required
             />
-            {error && (
-              <p className="text-sm text-destructive text-center">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500">{error}</p>}
           </div>
-          <Button
-            type="submit"
-            className="w-full h-12"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Verifying...
-              </>
-            ) : (
-              "Enter"
-            )}
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? 'Signing in...' : 'Sign in'}
           </Button>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
-} 
+}
