@@ -13,7 +13,7 @@ import { SESSION_KEY } from '@/lib/constants';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
