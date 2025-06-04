@@ -19,7 +19,7 @@ const travelCards: TravelCard[] = [
   {
     id: 1,
     title: 'Santorini, Greece',
-    imageUrl: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?q=80&w=1000',
+    imageUrl: 'santorini_keamhc',
     author: 'Edsel Serrano',
   },
   {
