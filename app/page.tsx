@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { LoginForm } from '@/components/auth/login-form';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { ImageModal } from '@/components/ui/image-modal';
-import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
 import { SESSION_KEY } from '@/lib/constants';
 
 interface TravelCard {
@@ -82,7 +82,7 @@ export default function Home() {
             onClick={() => setSelectedCard(card)}
           >
             <div className="relative h-48">
-              <Image
+              <CldImage
                 src={card.imageUrl}
                 alt={card.title}
                 fill
