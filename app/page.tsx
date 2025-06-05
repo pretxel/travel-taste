@@ -15,29 +15,9 @@ interface TravelCard {
   author: string;
 }
 
-const travelCards: TravelCard[] = [
-  {
-    id: 1,
-    title: 'Santorini, Greece',
-    imageUrl: 'santorini_keamhc',
-    author: 'Edsel Serrano',
-  },
-  {
-    id: 2,
-    title: 'Kyoto, Japan',
-    imageUrl: 'https://images.unsplash.com/photo-1492571350019-22de08371fd3?q=80&w=1000',
-    author: 'Edsel Serrano',
-  },
-  {
-    id: 3,
-    title: 'Machu Picchu, Peru',
-    imageUrl: 'https://images.unsplash.com/photo-1526392060635-9d6019884377?q=80&w=1000',
-    author: 'Edsel Serrano',
-  },
-];
-
 export default function Home() {
   const [hasSession, setHasSession] = useState(false);
+  const [travelCards, setTravelCards] = useState<TravelCard[]>([]);
   const [selectedCard, setSelectedCard] = useState<TravelCard | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -48,6 +28,19 @@ export default function Home() {
       setHasSession(session === 'authenticated');
     }
   }, [mounted]);
+
+  useEffect(() => {
+    async function fetchCards() {
+      try {
+        const response = await fetch('/api/travel-cards');
+        const data = await response.json();
+        setTravelCards(data);
+      } catch (error) {
+        console.error('Failed to load travel cards', error);
+      }
+    }
+    fetchCards();
+  }, []);
 
   if (!mounted) {
     return null;
