@@ -10,6 +10,7 @@ import { Inter } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { SESSION_KEY } from '@/lib/constants';
+import Image from 'next/image';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -42,9 +43,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           enableSystem
           disableTransitionOnChange
         >
-          <div className="min-h-screen bg-background">
+          <div className="relative flex min-h-screen flex-col">
+            <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+              <Image src="/blur-bg.svg" alt="" fill priority className="object-cover blur-3xl" />
+            </div>
             <Navigation onLogout={handleLogout} themeToggle={<ThemeToggle />} />
-            <main className="relative z-[100] pb-20 md:pb-0 md:pt-20">{children}</main>
+            <main className="relative z-10 flex-1 pb-20 md:pb-0 md:pt-20">{children}</main>
           </div>
           <Toaster />
         </ThemeProvider>
