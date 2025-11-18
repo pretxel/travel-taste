@@ -5,8 +5,12 @@ import prettier from 'eslint-config-prettier';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import nextPlugin from '@next/eslint-plugin-next';
+import globals from 'globals';
 
 export default [
+  {
+    ignores: ["**/out/**", "**/.next/**", "**/node_modules/**", "next.config.js", "postcss.config.js", "tailwind.config.ts"]
+  },
   js.configs.recommended,
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
@@ -17,6 +21,10 @@ export default [
       '@next/next': nextPlugin
     },
     languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
       parser: typescriptParser,
       parserOptions: {
         ecmaVersion: 'latest',
