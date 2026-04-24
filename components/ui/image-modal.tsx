@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 import { CldImage } from 'next-cloudinary';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import type { Photo } from '@/lib/photos';
 
 interface ImageModalProps {
@@ -55,9 +55,9 @@ export function ImageModal({ photos, index, onIndexChange, onClose }: ImageModal
     >
       <DialogContent
         className="max-w-5xl p-0 bg-background overflow-hidden"
-        aria-describedby={undefined}
         onEscapeKeyDown={e => e.preventDefault()}
       >
+        <DialogTitle className="sr-only">{current.publicId}</DialogTitle>
         <div
           data-testid="modal-swipe-surface"
           className="relative flex items-center justify-center bg-black/95"
@@ -79,7 +79,7 @@ export function ImageModal({ photos, index, onIndexChange, onClose }: ImageModal
             src={current.publicId}
             width={current.width}
             height={current.height}
-            alt=""
+            alt={current.publicId}
             className="max-h-[80vh] w-auto h-auto object-contain"
           />
 
@@ -103,15 +103,6 @@ export function ImageModal({ photos, index, onIndexChange, onClose }: ImageModal
               </button>
             </>
           )}
-
-          <button
-            type="button"
-            aria-label="Close"
-            onClick={onClose}
-            className="absolute right-2 top-2 rounded-full bg-background/70 p-2 hover:bg-background"
-          >
-            <X className="h-5 w-5" />
-          </button>
         </div>
         <p className="px-4 py-2 text-center text-xs text-muted-foreground truncate">
           {current.publicId}

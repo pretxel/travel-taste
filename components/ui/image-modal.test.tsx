@@ -36,7 +36,9 @@ describe('ImageModal', () => {
     setup(1);
     const img = screen.getByTestId('cld-image') as HTMLImageElement;
     expect(img.getAttribute('src')).toBe('b');
-    expect(screen.getByText('b')).toBeInTheDocument();
+    const matches = screen.getAllByText('b');
+    expect(matches.length).toBeGreaterThan(0);
+    expect(matches.some(el => el.tagName === 'P')).toBe(true);
   });
 
   it('ArrowRight advances to next image and wraps at end', async () => {
