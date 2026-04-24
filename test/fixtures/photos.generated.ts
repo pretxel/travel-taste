@@ -1,4 +1,4 @@
-import type { PhotoSection } from '../../lib/photos';
+import type { PhotoSection } from '@/lib/photos';
 
 export const SECTIONS: PhotoSection[] = [
   {
