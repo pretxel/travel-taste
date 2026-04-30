@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyOwnerJwt } from '@/lib/auth/owner';
-import { OWNER_COOKIE } from '@/lib/constants';
+import { verifyViewerJwt } from '@/lib/auth/viewer';
+import { OWNER_COOKIE, VIEWER_COOKIE } from '@/lib/constants';
+import { supabaseServiceRole } from '@/lib/supabase/server';
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/admin/:path*'],
+  matcher: ['/feed/:path*', '/admin/:path*', '/api/admin/:path*'],
   runtime: 'nodejs',
 };
 
@@ -12,22 +14,52 @@ const OWNER_PUBLIC = new Set(['/admin/login', '/api/admin/login']);
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  if (OWNER_PUBLIC.has(pathname)) return NextResponse.next();
+  // ───── Owner-gated ─────
+  if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
+    if (OWNER_PUBLIC.has(pathname)) return NextResponse.next();
+    const cookie = req.cookies.get(OWNER_COOKIE)?.value;
+    if (cookie) {
+      try {
+        await verifyOwnerJwt(cookie);
+        return NextResponse.next();
+      } catch {
+        /* fall through */
+      }
+    }
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const url = req.nextUrl.clone();
+    url.pathname = '/admin/login';
+    return NextResponse.redirect(url);
+  }
 
-  const cookie = req.cookies.get(OWNER_COOKIE)?.value;
-  if (cookie) {
+  // ───── Viewer-gated ─────
+  if (pathname.startsWith('/feed')) {
+    const cookie = req.cookies.get(VIEWER_COOKIE)?.value;
+    if (!cookie) return redirectHome(req);
     try {
-      await verifyOwnerJwt(cookie);
+      const claims = await verifyViewerJwt(cookie);
+      const sb = supabaseServiceRole();
+      const { data } = await sb
+        .from('viewer_codes')
+        .select('revoked_at')
+        .eq('id', claims.viewer_code_id)
+        .single();
+      if (!data || data.revoked_at) return redirectHome(req);
       return NextResponse.next();
     } catch {
-      // fall through
+      return redirectHome(req);
     }
   }
 
-  if (pathname.startsWith('/api/')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  return NextResponse.next();
+}
+
+function redirectHome(req: NextRequest) {
   const url = req.nextUrl.clone();
-  url.pathname = '/admin/login';
-  return NextResponse.redirect(url);
+  url.pathname = '/';
+  const res = NextResponse.redirect(url);
+  res.cookies.set(VIEWER_COOKIE, '', { maxAge: 0, path: '/' });
+  return res;
 }
