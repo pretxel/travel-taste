@@ -1,0 +1,10 @@
+# ai.txt — content usage policy for AI/ML systems
+# Spec reference: https://site.spawning.ai/spaces/ai-txt
+
+User-Agent: *
+Disallow: /
+
+# This site is private (passcode-gated). All photographs and captions are
+# personal correspondence and are NOT licensed for AI training, retrieval-
+# augmented generation, summarization, embedding, fine-tuning, or any other
+# automated reuse. Permission is not granted for the entire path tree.
