@@ -1,57 +1,94 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code working in this repo.
 
 ## Commands
 
-Package manager: **pnpm** (lockfile is `pnpm-lock.yaml`).
+Package manager: **pnpm**.
 
-- `pnpm dev` — start Next.js dev server
-- `pnpm build` — produce static export into `out/` (Next config sets `output: 'export'`)
-- `pnpm start` — serve built app
-- `pnpm lint` / `pnpm lint:fix` — ESLint (flat config in `eslint.config.mjs`)
-- `pnpm test` / `pnpm test:watch` — Vitest unit tests (jsdom)
-- `pnpm test:e2e` / `pnpm test:e2e:ui` — Playwright end-to-end tests
-- `node scripts/fetch-photos.mjs` — manual regeneration of `lib/photos.generated.ts` (also runs via `predev` / `prebuild`)
+- `pnpm dev` — Next.js dev server.
+- `pnpm build` / `pnpm start` — production build + serve.
+- `pnpm lint` / `pnpm lint:fix` — ESLint (flat config in `eslint.config.mjs`).
+- `pnpm test` / `pnpm test:watch` — Vitest unit + integration tests.
+- `pnpm test:e2e` / `pnpm test:e2e:ui` — Playwright end-to-end tests.
+- `pnpm db:start` / `pnpm db:stop` — Supabase local stack (Docker).
+- `pnpm db:reset` — drop and re-apply all migrations.
+- `pnpm db:diff` — generate a new migration from local edits.
 
-Husky + `lint-staged` run `eslint --fix` and `prettier --write` on staged `*.{js,jsx,ts,tsx}` via the `pre-commit` hook.
+Husky + `lint-staged` run `eslint --fix` and `prettier --write` on staged `*.{js,jsx,ts,tsx}`.
 
 ## Environment
 
-- `NEXT_PUBLIC_APP_PASSWORD` — gate password checked client-side in `components/auth/login-form.tsx`. Default in `.env` is `travel123`. Because it's `NEXT_PUBLIC_*`, it ships to the browser — this auth is purely cosmetic.
-- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `CLOUDINARY_ROOT_FOLDER` — read only by the prebuild script (`scripts/fetch-photos.mjs`). Never prefix with `NEXT_PUBLIC_`. If `PHOTOS_FIXTURE_PATH` is set, the script copies that fixture instead (used by e2e tests/CI).
+Server-only (`.env`, never `NEXT_PUBLIC_*`):
+- `OWNER_PASSWORD` — owner sign-in password (constant-time compared).
+- `VIEWER_JWT_SECRET` / `OWNER_JWT_SECRET` — HS256 JWT secrets, ≥32 random bytes.
+- `SUPABASE_SERVICE_ROLE_KEY` — used by all `/api/admin/*` and `/api/feed`.
+
+Public:
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+
+`.env.example` documents the full set including Playwright `*_TEST` slots.
 
 ## Architecture
 
-Next.js 16 App Router + React 19, exported as a **static site** (`next.config.js` → `output: 'export'`, `images.unoptimized: true`). No server runtime at deploy time; everything runs client-side.
+Next.js 16 App Router on Vercel Fluid Compute. Single Supabase backend (Postgres + Storage + RLS). No more static export.
 
-- `app/layout.tsx` — Root server component; delegates rendering to `components/client-layout.tsx`.
-- `components/client-layout.tsx` — Client component. Gates the entire app on a `mounted` flag (returns `null` until `useEffect` fires) to avoid hydration mismatch from `localStorage`/`next-themes`. Wraps children in `ThemeProvider` + `Toaster` and renders `<Navigation>`. `handleLogout` clears the session and hard-navigates to `/`.
-- `app/page.tsx` — Single route. Reads `localStorage[SESSION_KEY]` after mount; shows `LoginForm` when unauthenticated, a card grid otherwise. Cloudinary images render via `<CldImage>` from `next-cloudinary` (public IDs) alongside `unsplash` remote URLs allowlisted in `next.config.js`.
-- `lib/constants.ts` — Exports `SESSION_KEY = 'session'`. Note: `components/auth/login-form.tsx` currently **redeclares** this constant locally instead of importing it; keep both in sync or refactor.
-- `components/ui/*` — shadcn/ui components (config in `components.json`, baseColor `neutral`, CSS vars enabled). Add new ones via the shadcn CLI; they land here.
+- **Public landing (`/`)** — server component checks `viewer_session` cookie; renders `<CodeEntry/>` if absent/invalid, redirects to `/feed` if valid.
+- **Viewer feed (`/feed`, `/feed/[postId]`)** — server-rendered, gated by `middleware.ts` which verifies the viewer JWT and rejects revoked codes via a cheap indexed Postgres lookup on every navigation.
+- **Owner admin (`/admin/*`)** — gated by `middleware.ts` against the owner JWT. `/admin/login` is the only public sub-route; `/api/admin/login` likewise public.
+- **API routes**:
+  - `viewer/redeem` — argon2 verifies code against active rows, signs JWT, sets cookie, audits redemption.
+  - `viewer/logout` — clears cookie.
+  - `admin/login` / `admin/logout` — password gate, owner cookie.
+  - `admin/posts` — POST upload (sharp pipeline), GET list with signed URLs, DELETE per id.
+  - `admin/codes` — CRUD viewer codes; create returns plaintext ONCE (`XXXXX-XXXXX`).
+  - `feed` — viewer-side post fetch with cursor pagination (20/page).
 
-### Auth flow (client-only)
+Storage uses a **private** `posts` bucket; viewers see signed URLs only (1 h TTL, regenerated on each render).
 
-1. `LoginForm` compares the input against `process.env.NEXT_PUBLIC_APP_PASSWORD`, sets `localStorage['session'] = 'authenticated'`, hard-navigates to `/`.
-2. `Home` and `Navigation` each mount, read the session key, and conditionally render.
-3. Logout clears the key and hard-navigates.
+## Auth flow
 
-Any page/component needing session state must follow the same **mount-then-read** pattern to stay hydration-safe under static export.
+Viewer:
+1. POST `/api/viewer/redeem` with code → server argon2-verifies, signs `viewer_session` httpOnly cookie (HS256, 30 d rolling).
+2. Middleware decodes cookie + verifies code is not revoked on every `/feed/*` navigation.
+3. Logout clears cookie.
 
-### Path aliases
+Owner:
+1. POST `/api/admin/login` with password (constant-time compare) → sets `owner_session` (HS256, 7 d absolute, SameSite=Strict).
+2. Middleware verifies on every `/admin/*` and `/api/admin/*` (except `/admin/login` itself).
 
-`@/*` maps to the repo root (see `tsconfig.json` and `components.json` aliases: `components`, `utils`, `ui`, `lib`, `hooks`).
+Rate limits (Postgres-backed sliding window in `rate_limit_attempts`):
+- viewer redeem: 10 / 60 s per IP
+- owner login: 5 / 600 s per IP
 
-### Styling
+## Data model
 
-Tailwind v3 (`tailwind.config.ts`) + CSS variables from `app/globals.css`. Theme handled by `next-themes` via `ThemeProvider` (`attribute="class"`, system default). Use `cn()` from `lib/utils.ts` for class merging.
+`supabase/migrations/0001_init.sql`:
+- `posts` (id, storage_path, caption, taken_at, created_at, width, height, blurhash) — RLS lets `anon` SELECT iff JWT carries `viewer_code_id`.
+- `viewer_codes` (label, code_hash, revoked_at, last_used_at).
+- `viewer_sessions` — audit log of redemptions.
+- `rate_limit_attempts` — sliding-window bucket.
 
-### Photo gallery data flow
+## Path aliases
 
-`scripts/fetch-photos.mjs` runs before `next dev` and `next build`. It calls Cloudinary's Admin API (or copies a fixture if `PHOTOS_FIXTURE_PATH` is set), passes resources through the pure `groupResources` function in `lib/photos-build.ts`, and writes the result to `lib/photos.generated.ts` (gitignored). `app/page.tsx` imports `SECTIONS` from that generated file. Each section renders via `components/gallery/photo-section.tsx`, which owns its own modal state. `components/ui/image-modal.tsx` is a Radix Dialog driven by an array + index with wrap-around prev/next, keyboard navigation, and pointer-based swipe.
+`@/*` → repo root (`tsconfig.json` + `components.json`).
+
+## Styling
+
+Tailwind v3 + shadcn/ui (`components/ui/*`, baseColor `neutral`). Theme handled by `next-themes`. Use `cn()` from `lib/utils.ts`.
+
+## Photo upload
+
+Owner POSTs `multipart/form-data` to `/api/admin/posts`. Server pipeline (`lib/photos/process.ts`):
+1. Validate mime ∈ `{jpeg, png, webp, heic}` and size ≤ 20 MB.
+2. Extract EXIF `DateTimeOriginal` → `taken_at`.
+3. Strip EXIF (no GPS leak), auto-rotate, resize ≤ 2400 px on long edge.
+4. Re-encode JPEG q=82 (mozjpeg).
+5. Compute blurhash via `blurhash` from a 32×32 raw RGBA preview.
+6. Upload to Supabase Storage `posts/YYYY/MM/<uuid>.jpg`, then DB insert. On DB failure, best-effort storage cleanup.
 
 ## Notable constraints
 
-- Static export: no API routes, no server actions, no middleware at runtime. Images must be `unoptimized` or go through a remote loader (Cloudinary).
-- Files that touch `window`/`localStorage`/`process.env` at render time carry `/* eslint-disable no-undef */` and gate on a `mounted` state. Preserve this pattern for any new client-only logic.
+- Middleware runs on Node runtime (`runtime: 'nodejs'`) so it can use `@supabase/supabase-js` and `jose` directly. `@node-rs/argon2` is server-only and lives in route handlers, not middleware.
+- Service role key never ships to the browser. Only used by `lib/supabase/server.ts → supabaseServiceRole()`.
+- All viewer reads from Storage go through server-minted signed URLs; bucket is private at the RLS layer.
