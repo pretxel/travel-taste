@@ -20,20 +20,23 @@ export function MasonryFeed({
   nextCursor: string | null;
 }) {
   return (
-    <div className="columns-2 gap-3 px-3 [column-fill:_balance] sm:gap-4 sm:px-4">
-      {posts.map(p => (
-        <PostTile
-          key={p.id}
-          id={p.id}
-          url={p.signed_url}
-          caption={p.caption}
-          width={p.width}
-          height={p.height}
-          takenAt={p.taken_at}
-          createdAt={p.created_at}
-        />
-      ))}
-      <LoadMore initialCursor={nextCursor} />
+    <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">
+      <div className="columns-2 gap-5 [column-fill:_balance] sm:columns-3 sm:gap-7">
+        {posts.map((p, i) => (
+          <PostTile
+            key={p.id}
+            index={i}
+            id={p.id}
+            url={p.signed_url}
+            caption={p.caption}
+            width={p.width}
+            height={p.height}
+            takenAt={p.taken_at}
+            createdAt={p.created_at}
+          />
+        ))}
+        <LoadMore initialCursor={nextCursor} />
+      </div>
     </div>
   );
 }

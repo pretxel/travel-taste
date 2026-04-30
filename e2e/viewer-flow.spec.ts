@@ -13,7 +13,7 @@ test('viewer enters code, sees feed, opens detail', async ({ page, baseURL }) =>
 
   await page.goto('/');
   await page.getByLabel('Your code').fill(code);
-  await page.getByRole('button', { name: /enter/i }).click();
+  await page.getByRole('button', { name: /open the letter|stamping/i }).click();
   await page.waitForURL('**/feed');
   await expect(page.locator('img').first()).toBeVisible();
   await page.locator('a[href^="/feed/"]').first().click();

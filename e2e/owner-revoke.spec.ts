@@ -15,7 +15,7 @@ test('revoking a code kicks the viewer back to /', async ({ baseURL, browser }) 
   const viewer = await ctx.newPage();
   await viewer.goto('/');
   await viewer.getByLabel('Your code').fill(code);
-  await viewer.getByRole('button', { name: /enter/i }).click();
+  await viewer.getByRole('button', { name: /open the letter|stamping/i }).click();
   await viewer.waitForURL('**/feed');
 
   const list = await (await owner.get('/api/admin/codes')).json();
