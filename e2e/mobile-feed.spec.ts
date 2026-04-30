@@ -19,7 +19,7 @@ test('mobile viewport renders 2-col masonry', async ({ baseURL, browser }) => {
   const v = await ctx.newPage();
   await v.goto('/');
   await v.getByLabel('Your code').fill(code);
-  await v.getByRole('button', { name: /enter/i }).click();
+  await v.getByRole('button', { name: /open the letter|stamping/i }).click();
   await v.waitForURL('**/feed');
 
   const tiles = v.locator('a[href^="/feed/"]');

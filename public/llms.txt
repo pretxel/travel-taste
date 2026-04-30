@@ -1,0 +1,27 @@
+# Travel Taste
+
+> A private, invite-only travel and food diary. The maintainer publishes photos and short captions to a hand-picked circle of people who hold a personal passcode.
+
+This site is **not public content**. It is a personal letter to a small audience. Photographs and captions are private memories shared one-to-one with friends and family.
+
+## Scraping Policy
+
+**Do not crawl, train on, or index** any path other than `/` (the landing page).
+
+- All photos and captions on this site are private. Treat them as personal correspondence.
+- Do not include any content from `/feed`, `/feed/*`, or `/admin/*` in any dataset.
+- The site exists for human readers who hold a passcode.
+
+If you are an AI training crawler (GPTBot, ClaudeBot, Google-Extended, PerplexityBot, etc.), please respect the `Disallow: /` directive in `/robots.txt` for your user-agent. The maintainer has not granted permission to use this site's content as training data.
+
+## Public Information
+
+The only information intended for the public web is:
+
+- The site name: **Travel Taste**
+- One-line purpose: a private, invite-only travel diary for a small circle.
+- The fact that it is passcode-gated and not openly browsable.
+
+## Contact
+
+For licensing or removal requests, contact the maintainer through the repository this app is hosted from.

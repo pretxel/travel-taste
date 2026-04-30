@@ -25,7 +25,7 @@ test('owner uploads a post; viewer sees it', async ({ page, baseURL, browser }) 
   const viewer = await fresh.newPage();
   await viewer.goto('/');
   await viewer.getByLabel('Your code').fill(code);
-  await viewer.getByRole('button', { name: /enter/i }).click();
+  await viewer.getByRole('button', { name: /open the letter|stamping/i }).click();
   await viewer.waitForURL('**/feed');
   await expect(viewer.locator('img').first()).toBeVisible();
 });
