@@ -40,3 +40,10 @@ next-env.d.ts
 
 # generated Cloudinary photo manifest
 lib/photos.generated.ts
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+.env
+.env.local
+.env.test
