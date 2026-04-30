@@ -62,8 +62,9 @@ Drop `output: 'export'`. Run Next.js 16 App Router on Vercel Fluid Compute. Thre
 - `DELETE /api/admin/codes/[id]` — revoke (sets `revoked_at`).
 
 **Middleware (`middleware.ts`):**
-- Protects `/feed/*` — verifies viewer cookie, looks up `viewer_codes` to confirm not revoked.
-- Protects `/admin/*` (except `/admin/login`) — verifies owner cookie.
+- Protects `/feed` and `/feed/[postId]` (and any future `/feed/*` route) — verifies viewer cookie, looks up `viewer_codes` to confirm not revoked. Direct navigation to a post detail URL without a valid viewer cookie redirects to `/`.
+- Protects `/admin` and all `/admin/*` routes except `/admin/login` — verifies owner cookie. Failure redirects to `/admin/login`.
+- Protects `/api/admin/*` route handlers — same owner cookie check; failure returns 401 JSON.
 
 Supabase = single source of truth. Storage holds photos in a private bucket. Postgres holds posts, codes, redemption audit log. Viewer reads use anon key + JWT-backed RLS. Owner writes go through server routes that hold the service role key in env.
 
@@ -133,6 +134,8 @@ create policy posts_viewer_read on posts
 Signed with `VIEWER_JWT_SECRET` (HS256). Posted to Supabase as `Authorization: Bearer <jwt>` on the anon client; Postgres `request.jwt.claims` then includes `viewer_code_id`, satisfying the RLS policy.
 
 **Code storage:** plaintext code is shown to the owner ONCE at creation, stored as an argon2 hash, and cannot be re-displayed. The owner must copy/save the code at creation time.
+
+**Code format:** 10-character base32-Crockford string (no `0/O/I/L/U` to avoid misreads), generated via crypto-random bytes → ~50 bits of entropy. Easy to read aloud, hard to brute-force. Displayed grouped: `XXXXX-XXXXX`. Stored as the unbroken 10-char form (hashed).
 
 **Why no `viewers` table:** the code IS the viewer. One code per recipient. The label is human-readable. No accounts.
 
