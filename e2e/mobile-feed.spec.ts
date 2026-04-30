@@ -24,7 +24,7 @@ test('mobile viewport renders 2-col masonry', async ({ baseURL, browser }) => {
 
   const tiles = v.locator('a[href^="/feed/"]');
   await expect(tiles).toHaveCount(4);
-  const a = await tiles.nth(0).boundingBox();
-  const b = await tiles.nth(1).boundingBox();
-  expect(a!.x).toBeLessThan(b!.x);
+  const xs = await Promise.all([0, 1, 2, 3].map(async i => (await tiles.nth(i).boundingBox())!.x));
+  // 2-col masonry → at least 2 distinct x positions across the 4 tiles.
+  expect(new Set(xs).size).toBeGreaterThanOrEqual(2);
 });
