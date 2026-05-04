@@ -89,6 +89,6 @@ Owner POSTs `multipart/form-data` to `/api/admin/posts`. Server pipeline (`lib/p
 
 ## Notable constraints
 
-- Proxy runs on Node runtime (`runtime: 'nodejs'`) so it can use `@supabase/supabase-js` and `jose` directly. `@node-rs/argon2` is server-only and lives in route handlers, not the proxy.
+- Proxy runs on Node runtime (default in Next 16; `runtime` config option is not allowed in Proxy files), so it can use `@supabase/supabase-js` and `jose` directly. `@node-rs/argon2` is server-only and lives in route handlers, not the proxy.
 - Service role key never ships to the browser. Only used by `lib/supabase/server.ts → supabaseServiceRole()`.
 - All viewer reads from Storage go through server-minted signed URLs; bucket is private at the RLS layer.

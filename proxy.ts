@@ -6,7 +6,6 @@ import { supabaseServiceRole } from '@/lib/supabase/server';
 
 export const config = {
   matcher: ['/feed/:path*', '/admin/:path*', '/api/admin/:path*'],
-  runtime: 'nodejs',
 };
 
 const OWNER_PUBLIC = new Set(['/admin/login', '/api/admin/login']);
