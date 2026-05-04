@@ -34,8 +34,8 @@ Public:
 Next.js 16 App Router on Vercel Fluid Compute. Single Supabase backend (Postgres + Storage + RLS). No more static export.
 
 - **Public landing (`/`)** — server component checks `viewer_session` cookie; renders `<CodeEntry/>` if absent/invalid, redirects to `/feed` if valid.
-- **Viewer feed (`/feed`, `/feed/[postId]`)** — server-rendered, gated by `middleware.ts` which verifies the viewer JWT and rejects revoked codes via a cheap indexed Postgres lookup on every navigation.
-- **Owner admin (`/admin/*`)** — gated by `middleware.ts` against the owner JWT. `/admin/login` is the only public sub-route; `/api/admin/login` likewise public.
+- **Viewer feed (`/feed`, `/feed/[postId]`)** — server-rendered, gated by `proxy.ts` which verifies the viewer JWT and rejects revoked codes via a cheap indexed Postgres lookup on every navigation.
+- **Owner admin (`/admin/*`)** — gated by `proxy.ts` against the owner JWT. `/admin/login` is the only public sub-route; `/api/admin/login` likewise public.
 - **API routes**:
   - `viewer/redeem` — argon2 verifies code against active rows, signs JWT, sets cookie, audits redemption.
   - `viewer/logout` — clears cookie.
@@ -89,6 +89,6 @@ Owner POSTs `multipart/form-data` to `/api/admin/posts`. Server pipeline (`lib/p
 
 ## Notable constraints
 
-- Middleware runs on Node runtime (`runtime: 'nodejs'`) so it can use `@supabase/supabase-js` and `jose` directly. `@node-rs/argon2` is server-only and lives in route handlers, not middleware.
+- Proxy runs on Node runtime (`runtime: 'nodejs'`) so it can use `@supabase/supabase-js` and `jose` directly. `@node-rs/argon2` is server-only and lives in route handlers, not the proxy.
 - Service role key never ships to the browser. Only used by `lib/supabase/server.ts → supabaseServiceRole()`.
 - All viewer reads from Storage go through server-minted signed URLs; bucket is private at the RLS layer.

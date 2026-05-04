@@ -11,7 +11,7 @@ export const config = {
 
 const OWNER_PUBLIC = new Set(['/admin/login', '/api/admin/login']);
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // ───── Owner-gated ─────
