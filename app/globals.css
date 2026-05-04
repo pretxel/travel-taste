@@ -202,3 +202,201 @@
   background: hsl(var(--primary) / 0.25);
   color: hsl(var(--foreground));
 }
+
+/* ───── Postmaster's Desk (admin) ───── */
+@layer components {
+  /* Dotted postal rule */
+  .postal-rule {
+    background-image: radial-gradient(
+      hsl(var(--border)) 0.5px,
+      transparent 0.5px
+    );
+    background-size: 6px 1px;
+    background-repeat: repeat-x;
+    background-position: left center;
+    height: 1px;
+  }
+
+  /* Wax-seal style status pill */
+  .wax-seal {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.15rem 0.55rem;
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.625rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+  }
+  .wax-seal::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0 2px hsl(var(--background));
+  }
+
+  /* Perforated ticket — for one-time codes & receipts */
+  .perforated {
+    position: relative;
+    background:
+      radial-gradient(
+          circle at 0 50%,
+          hsl(var(--background)) 6px,
+          transparent 6.5px
+        )
+        left/12px 12px repeat-y,
+      radial-gradient(
+          circle at 100% 50%,
+          hsl(var(--background)) 6px,
+          transparent 6.5px
+        )
+        right/12px 12px repeat-y,
+      hsl(var(--popover));
+    border-top: 1px dashed hsl(var(--border));
+    border-bottom: 1px dashed hsl(var(--border));
+  }
+
+  /* Darkroom drop zone — for new post upload */
+  .darkroom-drop {
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        hsl(var(--muted) / 0.35) 0,
+        hsl(var(--muted) / 0.35) 6px,
+        transparent 6px,
+        transparent 14px
+      ),
+      radial-gradient(
+        ellipse at center,
+        hsl(var(--popover)) 0%,
+        hsl(var(--background)) 100%
+      );
+    border: 1.5px dashed hsl(var(--border));
+    transition:
+      border-color 200ms ease,
+      transform 200ms ease;
+  }
+  .darkroom-drop[data-drag='true'] {
+    border-color: hsl(var(--primary));
+    transform: scale(1.005);
+  }
+
+  /* Filmstrip border around contact-sheet thumbs */
+  .filmstrip {
+    background:
+      linear-gradient(
+        to bottom,
+        hsl(25 16% 9%) 0,
+        hsl(25 16% 9%) 8px,
+        transparent 8px,
+        transparent calc(100% - 8px),
+        hsl(25 16% 9%) calc(100% - 8px)
+      ),
+      hsl(25 16% 9%);
+    padding: 8px 6px;
+    border-radius: 2px;
+    position: relative;
+  }
+  .filmstrip::before,
+  .filmstrip::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    height: 6px;
+    background-image: radial-gradient(
+      circle,
+      hsl(var(--background)) 1.5px,
+      transparent 1.6px
+    );
+    background-size: 10px 6px;
+    background-repeat: repeat-x;
+  }
+  .filmstrip::before {
+    top: 1px;
+  }
+  .filmstrip::after {
+    bottom: 1px;
+  }
+
+  /* Ledger row — alternating warm stripe */
+  .ledger-row:nth-child(odd) {
+    background: hsl(var(--background-edge) / 0.5);
+  }
+
+  /* Postal corner ornament — used in admin frame */
+  .postal-corner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 96px;
+    height: 96px;
+    background: linear-gradient(
+        135deg,
+        transparent 49%,
+        hsl(var(--primary) / 0.12) 50%,
+        hsl(var(--primary) / 0.12) 100%
+      ),
+      repeating-linear-gradient(
+        135deg,
+        transparent 0,
+        transparent 12px,
+        hsl(var(--primary) / 0.18) 12px,
+        hsl(var(--primary) / 0.18) 13px
+      );
+    clip-path: polygon(100% 0, 100% 100%, 0 0);
+    pointer-events: none;
+  }
+
+  /* Index numeral — for contact-sheet enumeration */
+  .index-numeral {
+    font-family: var(--font-display), 'Fraunces', serif;
+    font-variation-settings:
+      'opsz' 144,
+      'SOFT' 30;
+    font-feature-settings: 'lnum' 1;
+    font-style: italic;
+    font-weight: 400;
+    color: hsl(var(--primary));
+    line-height: 1;
+  }
+
+  /* Telegram-style monospace receipt strip */
+  .telegram {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Stamp button — primary CTA with embossed feel */
+  .btn-stamp {
+    position: relative;
+    isolation: isolate;
+  }
+  .btn-stamp::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    border: 1px dashed hsl(var(--primary) / 0.4);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+  .btn-stamp:hover::before {
+    opacity: 1;
+  }
+
+  /* Tile rise stagger for ledger entries */
+  .ledger-in {
+    opacity: 0;
+    transform: translateY(6px);
+    animation: tile-rise 500ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  }
+}

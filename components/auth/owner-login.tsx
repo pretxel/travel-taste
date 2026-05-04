@@ -25,27 +25,40 @@ export function OwnerLogin() {
     }
     if (res.status === 429) {
       const j = await res.json().catch(() => ({}));
-      setErr(j.error ?? 'Too many attempts');
+      setErr(j.error ?? 'Too many attempts. Try later.');
       return;
     }
-    setErr('Invalid password');
+    setErr('That key does not fit this door.');
   }
 
   return (
     <form onSubmit={onSubmit} className="grid gap-4">
       <div className="grid gap-2">
-        <Label htmlFor="owner-pwd">Owner password</Label>
+        <Label htmlFor="owner-pwd" className="label-mono text-muted-foreground">
+          Owner key
+        </Label>
         <Input
           id="owner-pwd"
           type="password"
           value={pwd}
           onChange={e => setPwd(e.target.value)}
+          placeholder="••••••••"
+          className="rounded-sm tracking-widest"
           required
+          autoFocus
         />
-        {err && <p className="text-sm text-red-500">{err}</p>}
+        {err && (
+          <p role="alert" className="telegram text-destructive">
+            ✕ {err}
+          </p>
+        )}
       </div>
-      <Button type="submit" disabled={busy || !pwd}>
-        {busy ? 'Signing in…' : 'Sign in'}
+      <Button
+        type="submit"
+        disabled={busy || !pwd}
+        className="ink-press btn-stamp w-full rounded-sm"
+      >
+        {busy ? 'Turning the lock…' : 'Unlock the office'}
       </Button>
     </form>
   );
