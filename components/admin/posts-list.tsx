@@ -11,21 +11,33 @@ interface PostRow {
   signed_url: string;
 }
 
+async function fetchRows(): Promise<PostRow[]> {
+  const r = await fetch('/api/admin/posts');
+  const j = await r.json();
+  return j.posts ?? [];
+}
+
 export function PostsList() {
   const [rows, setRows] = useState<PostRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const r = await fetch('/api/admin/posts');
-    const j = await r.json();
-    setRows(j.posts ?? []);
+    setRows(await fetchRows());
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let cancelled = false;
+    fetchRows().then(next => {
+      if (cancelled) return;
+      setRows(next);
+      setLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function del(id: string) {
     if (!confirm('Pull this dispatch from the edition?')) return;

@@ -12,21 +12,33 @@ interface Row {
   last_used_at: string | null;
 }
 
+async function fetchRows(): Promise<Row[]> {
+  const r = await fetch('/api/admin/codes');
+  const j = await r.json();
+  return j.codes ?? [];
+}
+
 export function CodesTable() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const r = await fetch('/api/admin/codes');
-    const j = await r.json();
-    setRows(j.codes ?? []);
+    setRows(await fetchRows());
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let cancelled = false;
+    fetchRows().then(next => {
+      if (cancelled) return;
+      setRows(next);
+      setLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function revoke(id: string) {
     if (!confirm('Break the wax seal? The bearer will lose access immediately.')) return;
