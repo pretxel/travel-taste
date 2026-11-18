@@ -9,7 +9,7 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: ["**/out/**", "**/.next/**", "**/node_modules/**", "next.config.js", "postcss.config.js", "tailwind.config.ts"]
+    ignores: ["**/out/**", "**/.next/**", "**/node_modules/**", "**/.agents/**", "**/.claude/**", "next.config.js", "postcss.config.js", "tailwind.config.ts"]
   },
   js.configs.recommended,
   {
