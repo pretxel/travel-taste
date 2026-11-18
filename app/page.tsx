@@ -42,7 +42,7 @@ export default async function Home() {
         <div className="w-full space-y-10">
           <header className="space-y-4 text-center">
             <p className="label-mono text-muted-foreground">No. 01 · Private Edition</p>
-            <h1 className="display text-5xl leading-[0.9] sm:text-6xl">
+            <h1 className="display text-5xl leading-[0.9] sm:text-6xl sm:leading-none">
               Travel
               <span className="display-italic text-primary"> &amp; </span>
               Taste

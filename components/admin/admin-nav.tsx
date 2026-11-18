@@ -17,11 +17,11 @@ export function AdminNav() {
       aria-label="Admin sections"
       className="paper-card flex flex-wrap items-stretch justify-between rounded-sm"
     >
-      <ul className="flex flex-1 flex-wrap divide-x divide-dashed divide-border">
+      <ul className="flex flex-1 flex-wrap">
         {tabs.map(t => {
           const active = t.href === '/admin' ? pathname === '/admin' : pathname?.startsWith(t.href);
           return (
-            <li key={t.href} className="flex">
+            <li key={t.href} className="flex border-dashed border-border not-first:border-l">
               <Link
                 href={t.href}
                 aria-current={active ? 'page' : undefined}

@@ -40,7 +40,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           enableSystem
           disableTransitionOnChange
         >
-          <div className="relative z-[2]">{children}</div>
+          <div className="relative z-2">{children}</div>
           <Toaster />
         </ThemeProvider>
       </body>

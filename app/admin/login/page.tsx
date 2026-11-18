@@ -15,7 +15,7 @@ export default function Page() {
         <div className="w-full space-y-10">
           <header className="space-y-3 text-center">
             <p className="label-mono text-muted-foreground">No. 02 · Service Entrance</p>
-            <h1 className="display text-5xl leading-[0.92] sm:text-6xl">
+            <h1 className="display text-5xl leading-[0.92] sm:text-6xl sm:leading-none">
               Postmaster
               <span className="display-italic text-primary">&apos;s</span> door
             </h1>
