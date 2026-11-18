@@ -24,7 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <p className="telegram hidden sm:block">{today}</p>
           </div>
 
-          <h1 className="display mt-3 text-5xl leading-[0.92] sm:text-6xl">
+          <h1 className="display mt-3 text-5xl leading-[0.92] sm:text-6xl sm:leading-none">
             Edition
             <span className="display-italic text-primary"> Office</span>
           </h1>

@@ -21,7 +21,7 @@ export function MasonryFeed({
 }) {
   return (
     <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">
-      <div className="columns-2 gap-5 [column-fill:_balance] sm:columns-3 sm:gap-7">
+      <div className="columns-2 gap-5 [column-fill:balance] sm:columns-3 sm:gap-7">
         {posts.map((p, i) => (
           <PostTile
             key={p.id}

@@ -78,13 +78,15 @@ export function NewPostForm() {
       <form onSubmit={onSubmit} className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
         {/* Drop zone */}
         <div className="space-y-3">
-          <Label htmlFor="file" className="label-mono text-muted-foreground">
-            Photograph
-          </Label>
+          <div>
+            <Label htmlFor="file" className="label-mono text-muted-foreground">
+              Photograph
+            </Label>
+          </div>
 
           <div
             data-drag={drag}
-            className="darkroom-drop relative flex aspect-[4/3] cursor-pointer items-center justify-center overflow-hidden rounded-sm"
+            className="darkroom-drop relative flex aspect-4/3 cursor-pointer items-center justify-center overflow-hidden rounded-sm"
             onClick={() => inputRef.current?.click()}
             onDragOver={e => {
               e.preventDefault();
@@ -122,7 +124,7 @@ export function NewPostForm() {
                     selectFile(null);
                     if (inputRef.current) inputRef.current.value = '';
                   }}
-                  className="absolute right-3 top-3 rounded-full bg-background/90 px-3 py-1 label-mono shadow-sm hover:bg-background"
+                  className="absolute right-3 top-3 rounded-full bg-background/90 px-3 py-1 label-mono shadow-xs hover:bg-background"
                 >
                   Replace
                 </button>
@@ -165,7 +167,7 @@ export function NewPostForm() {
               onChange={e => setCaption(e.target.value)}
               rows={6}
               placeholder="A line, a memory, a coordinate…"
-              className="rounded-sm bg-popover/60 font-[var(--font-body)] text-base leading-relaxed"
+              className="rounded-sm bg-popover/60 font-(--font-body) text-base leading-relaxed"
             />
             <p className="telegram">
               {caption.length === 0

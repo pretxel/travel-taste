@@ -46,7 +46,7 @@ export function CodeEntry() {
           inputMode="text"
           placeholder="XXXXX-XXXXX"
           required
-          className="font-mono w-full border-0 border-b border-foreground/40 bg-transparent px-0 py-3 text-center text-2xl tracking-[0.4em] text-foreground caret-primary placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-0"
+          className="font-mono w-full border-0 border-b border-foreground/40 bg-transparent px-0 py-3 text-center text-2xl tracking-[0.4em] text-foreground caret-primary placeholder:text-muted-foreground/50 focus:border-primary focus:outline-hidden focus:ring-0"
         />
         {err && <p className="text-center text-sm italic text-destructive">{err}</p>}
       </div>

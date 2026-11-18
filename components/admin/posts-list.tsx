@@ -96,7 +96,7 @@ export function PostsList() {
                 <img
                   src={p.signed_url}
                   alt={p.caption ?? 'Untitled dispatch'}
-                  className="block aspect-[4/3] w-full rounded-sm object-cover"
+                  className="block aspect-4/3 w-full rounded-sm object-cover"
                   loading="lazy"
                 />
               </div>
@@ -143,7 +143,7 @@ function ContactSheetSkeleton() {
     <ul className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
         <li key={i} className="paper-card flex flex-col gap-3 p-5">
-          <div className="aspect-[4/3] w-full animate-pulse bg-muted/60" />
+          <div className="aspect-4/3 w-full animate-pulse bg-muted/60" />
           <div className="h-3 w-2/3 animate-pulse rounded bg-muted/60" />
           <div className="h-3 w-1/3 animate-pulse rounded bg-muted/60" />
         </li>

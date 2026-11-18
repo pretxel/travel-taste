@@ -75,7 +75,7 @@ Rate limits (Postgres-backed sliding window in `rate_limit_attempts`):
 
 ## Styling
 
-Tailwind v3 + shadcn/ui (`components/ui/*`, baseColor `neutral`). Theme handled by `next-themes`. Use `cn()` from `lib/utils.ts`.
+Tailwind v4 (CSS-first config in `app/globals.css`, no `tailwind.config.ts`; PostCSS via `@tailwindcss/postcss`) + shadcn/ui (`components/ui/*`, baseColor `neutral`). Animations via `tw-animate-css`. Theme handled by `next-themes`. Use `cn()` from `lib/utils.ts`.
 
 ## Photo upload
 

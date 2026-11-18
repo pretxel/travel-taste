@@ -38,7 +38,7 @@ export function PostDetail({ url, caption, width, height, takenAt, createdAt }: 
       <header className="mt-10 grid gap-6 border-b border-foreground/15 pb-7 sm:grid-cols-[1fr_auto] sm:items-end">
         <div>
           <p className="label-mono text-primary">A Postcard</p>
-          <h1 className="display mt-2 text-4xl leading-[0.95] sm:text-5xl">
+          <h1 className="display mt-2 text-4xl leading-[0.95] sm:text-5xl sm:leading-none">
             {taken ? (
               <>
                 <span>{taken.split(',')[0]}</span>
