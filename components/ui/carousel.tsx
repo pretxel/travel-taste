@@ -97,6 +97,8 @@ const Carousel = React.forwardRef<
       return;
     }
 
+    // Initial sync from Embla (external system) before subscribing to its events.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     onSelect(api);
     api.on('select', onSelect);
     api.on('reInit', onSelect);

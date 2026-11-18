@@ -12,16 +12,22 @@ export function NewPostForm() {
   const [busy, setBusy] = useState(false);
   const [drag, setDrag] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const previewUrlRef = useRef<string | null>(null);
 
-  useEffect(() => {
-    if (!file) {
-      setPreview(null);
-      return;
-    }
-    const url = URL.createObjectURL(file);
+  function selectFile(f: File | null) {
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    const url = f ? URL.createObjectURL(f) : null;
+    previewUrlRef.current = url;
+    setFile(f);
     setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
+  }
+
+  useEffect(
+    () => () => {
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    },
+    []
+  );
 
   function pick(f: File | null | undefined) {
     if (!f) return;
@@ -34,7 +40,7 @@ export function NewPostForm() {
       toast.error('Too large. Max 20 MB.');
       return;
     }
-    setFile(f);
+    selectFile(f);
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -113,7 +119,7 @@ export function NewPostForm() {
                   type="button"
                   onClick={e => {
                     e.stopPropagation();
-                    setFile(null);
+                    selectFile(null);
                     if (inputRef.current) inputRef.current.value = '';
                   }}
                   className="absolute right-3 top-3 rounded-full bg-background/90 px-3 py-1 label-mono shadow-sm hover:bg-background"
