@@ -19,5 +19,5 @@ export const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'i
 export const RESIZE_MAX_EDGE_PX = 2400;
 
 // Storage
-export const POSTS_BUCKET = 'posts';
+export const POSTS_BUCKET = 'tt_posts';
 export const SIGNED_URL_TTL_SEC = 60 * 60; // 1 hour

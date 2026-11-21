@@ -6,7 +6,7 @@ import { hashCode } from '@/lib/codes/hash';
 export async function GET() {
   const sb = supabaseServiceRole();
   const { data, error } = await sb
-    .from('viewer_codes')
+    .from('tt_viewer_codes')
     .select('id, label, created_at, revoked_at, last_used_at')
     .order('created_at', { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
   const sb = supabaseServiceRole();
   const { data, error } = await sb
-    .from('viewer_codes')
+    .from('tt_viewer_codes')
     .insert({ label, code_hash })
     .select('id, label, created_at')
     .single();

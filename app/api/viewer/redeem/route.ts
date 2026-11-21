@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
   const sb = supabaseServiceRole();
   const { data, error } = await sb
-    .from('viewer_codes')
+    .from('tt_viewer_codes')
     .select('id, label, code_hash')
     .is('revoked_at', null)
     .limit(200);
@@ -52,10 +52,10 @@ export async function POST(req: Request) {
   if (!match) return GENERIC_INVALID();
 
   await sb
-    .from('viewer_codes')
+    .from('tt_viewer_codes')
     .update({ last_used_at: new Date().toISOString() })
     .eq('id', match.id);
-  await sb.from('viewer_sessions').insert({
+  await sb.from('tt_viewer_sessions').insert({
     code_id: match.id,
     ip_hash: ipH,
     user_agent: req.headers.get('user-agent') ?? '',
