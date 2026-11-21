@@ -41,7 +41,7 @@ export async function proxy(req: NextRequest) {
       const claims = await verifyViewerJwt(cookie);
       const sb = supabaseServiceRole();
       const { data } = await sb
-        .from('viewer_codes')
+        .from('tt_viewer_codes')
         .select('revoked_at')
         .eq('id', claims.viewer_code_id)
         .single();

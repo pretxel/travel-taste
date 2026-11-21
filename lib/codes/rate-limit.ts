@@ -25,7 +25,7 @@ export async function checkAndRecord(
   const since = new Date(Date.now() - windowSec * 1000).toISOString();
 
   const { data, error } = await sb
-    .from('rate_limit_attempts')
+    .from('tt_rate_limit_attempts')
     .select('attempted_at')
     .eq('bucket', bucket)
     .eq('ip_hash', ipHash)
@@ -40,7 +40,7 @@ export async function checkAndRecord(
     return { allowed: false, remaining: 0, retryAfterSec: retry };
   }
 
-  await sb.from('rate_limit_attempts').insert({ bucket, ip_hash: ipHash });
+  await sb.from('tt_rate_limit_attempts').insert({ bucket, ip_hash: ipHash });
 
   return { allowed: true, remaining: count - used - 1, retryAfterSec: 0 };
 }

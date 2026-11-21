@@ -7,7 +7,7 @@ export default async function Page({ params }: { params: Promise<{ postId: strin
   const { postId } = await params;
   const sb = supabaseServiceRole();
   const { data, error } = await sb
-    .from('posts')
+    .from('tt_posts')
     .select('id, storage_path, caption, width, height, taken_at, created_at')
     .eq('id', postId)
     .single();

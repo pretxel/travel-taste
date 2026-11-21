@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
 export async function GET() {
   const sb = supabaseServiceRole();
   const { data, error } = await sb
-    .from('posts')
+    .from('tt_posts')
     .select('id, caption, created_at, storage_path')
     .order('created_at', { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
   }
 
   const ins = await sb
-    .from('posts')
+    .from('tt_posts')
     .insert({
       storage_path: path,
       caption: caption || null,

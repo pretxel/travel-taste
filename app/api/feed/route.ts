@@ -22,7 +22,7 @@ export async function GET(req: Request) {
 
   const sb = supabaseServiceRole();
   let q = sb
-    .from('posts')
+    .from('tt_posts')
     .select('id, storage_path, caption, width, height, blurhash, taken_at, created_at')
     .order('created_at', { ascending: false })
     .limit(PAGE + 1);
